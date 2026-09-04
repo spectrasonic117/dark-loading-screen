@@ -4,7 +4,8 @@
 	"compatibilityLevel": "JAVA_25",
 	"client": [
 		"LoadingOverlayMixin",
-		"LogoTextureMixin"
+		"LogoTextureMixin",
+		"GlCommandEncoderMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
@@ -14,5 +15,6 @@
 	},
 	"mixinextras": {
 		"minVersion": "0.5.3"
-	}
+	},
+	"plugin": "io.github.a5b84.darkloadingscreen.mixin.MixinPlugin"
 }

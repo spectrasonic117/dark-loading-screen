@@ -9,7 +9,7 @@ public class ModMenuApiImpl implements ModMenuApi {
   private static final ConfigScreenFactory<?> FACTORY =
       FabricLoader.getInstance().isModLoaded("cloth-config2")
           ? new ConfigScreenFactoryImpl()
-          : _ -> null;
+          : parent -> null;
 
   @Override
   public ConfigScreenFactory<?> getModConfigScreenFactory() {

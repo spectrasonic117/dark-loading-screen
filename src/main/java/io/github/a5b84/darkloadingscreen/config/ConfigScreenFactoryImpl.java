@@ -1,7 +1,9 @@
 package io.github.a5b84.darkloadingscreen.config;
 
+import static io.github.a5b84.darkloadingscreen.DarkLoadingScreen.config;
+import static io.github.a5b84.darkloadingscreen.config.Config.DEFAULT;
+
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
-import io.github.a5b84.darkloadingscreen.DarkLoadingScreen;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -20,30 +22,41 @@ public class ConfigScreenFactoryImpl implements ConfigScreenFactory<Screen> {
             .setParentScreen(parent)
             .setTitle(Component.translatable("darkLoadingScreen.config.title"));
 
-    Config oldConfig = DarkLoadingScreen.config;
+    // Keep the old config in case the user wants to close without saving
+    Config oldConfig = config;
 
+    // Fields
     ConfigCategory category = builder.getOrCreateCategory(Component.empty());
     ConfigEntries entries = new ConfigEntries(builder.entryBuilder(), category);
     category.addEntry(
         new ButtonEntry(
-            Component.translatable("darkLoadingScreen.config.entry.preview"),
-            _ -> {
-              DarkLoadingScreen.config = entries.createConfig();
+            fieldName("preview"),
+            button -> {
+              // Preview button
+              config = entries.createConfig();
               Minecraft.getInstance()
-                  .gui
-                  .setOverlay(
-                      new PreviewSplashOverlay(500, () -> DarkLoadingScreen.config = oldConfig));
+                  .setOverlay(new PreviewSplashOverlay(500, () -> config = oldConfig));
             }));
 
+    // Saving
     builder.setSavingRunnable(
         () -> {
-          Config config = DarkLoadingScreen.config = entries.createConfig();
-          ConfigSerialization.write(config);
+          config = entries.createConfig();
+          config.write();
         });
 
+    // Done
     return builder.build();
   }
 
+  /**
+   * @return a {@link Component} that indentifies a field
+   */
+  private static Component fieldName(String id) {
+    return Component.translatable("darkLoadingScreen.config.entry." + id);
+  }
+
+  /** Class that holds/handles all the fields */
   private static class ConfigEntries {
 
     private final ConfigEntryBuilder builder;
@@ -56,46 +69,23 @@ public class ConfigScreenFactoryImpl implements ConfigScreenFactory<Screen> {
     private final FloatListEntry fadeInDurationField;
     private final FloatListEntry fadeOutDurationField;
 
-    /** Creates all the fields and adds them to {@code category}. */
+    /** Creates all the fields and adds them to {@code category} */
     public ConfigEntries(ConfigEntryBuilder builder, ConfigCategory category) {
       this.builder = builder;
       this.category = category;
 
       backgroundColorField =
-          createColorField(
-              Component.translatable("darkLoadingScreen.config.entry.background"),
-              DarkLoadingScreen.config.backgroundColor,
-              Config.DEFAULT.backgroundColor);
-      barColorField =
-          createColorField(
-              Component.translatable("darkLoadingScreen.config.entry.bar"),
-              DarkLoadingScreen.config.barColor,
-              Config.DEFAULT.barColor);
+          createColorField("background", config.backgroundColor, DEFAULT.backgroundColor);
+      barColorField = createColorField("bar", config.barColor, DEFAULT.barColor);
       barBackgroundColorField =
-          createColorField(
-              Component.translatable("darkLoadingScreen.config.entry.barBackground"),
-              DarkLoadingScreen.config.barBackgroundColor,
-              Config.DEFAULT.barBackgroundColor);
+          createColorField("barBackground", config.barBackgroundColor, DEFAULT.barBackgroundColor);
       barBorderColorField =
-          createColorField(
-              Component.translatable("darkLoadingScreen.config.entry.border"),
-              DarkLoadingScreen.config.barBorderColor,
-              Config.DEFAULT.barBorderColor);
-      logoColorField =
-          createColorField(
-              Component.translatable("darkLoadingScreen.config.entry.logo"),
-              DarkLoadingScreen.config.logoColor,
-              Config.DEFAULT.logoColor);
+          createColorField("border", config.barBorderColor, DEFAULT.barBorderColor);
+      logoColorField = createColorField("logo", config.logoColor, DEFAULT.logoColor);
       fadeInDurationField =
-          createFadeTimeField(
-              Component.translatable("darkLoadingScreen.config.entry.fadeIn"),
-              DarkLoadingScreen.config.fadeInDuration,
-              Config.DEFAULT.fadeInDuration);
+          createFadeTimeField("fadeIn", config.fadeInDuration, DEFAULT.fadeInDuration);
       fadeOutDurationField =
-          createFadeTimeField(
-              Component.translatable("darkLoadingScreen.config.entry.fadeOut"),
-              DarkLoadingScreen.config.fadeOutDuration,
-              Config.DEFAULT.fadeOutDuration);
+          createFadeTimeField("fadeOut", config.fadeOutDuration, DEFAULT.fadeOutDuration);
     }
 
     public Config createConfig() {
@@ -109,16 +99,19 @@ public class ConfigScreenFactoryImpl implements ConfigScreenFactory<Screen> {
           fadeOutDurationField.getValue());
     }
 
-    private ColorEntry createColorField(Component name, int value, int defaultValue) {
-      ColorEntry entry = builder.startColorField(name, value).setDefaultValue(defaultValue).build();
+    // Methods that create entries
+
+    private ColorEntry createColorField(String id, int value, int defaultValue) {
+      ColorEntry entry =
+          builder.startColorField(fieldName(id), value).setDefaultValue(defaultValue).build();
       category.addEntry(entry);
       return entry;
     }
 
-    private FloatListEntry createFadeTimeField(Component name, float value, float defaultValue) {
+    private FloatListEntry createFadeTimeField(String id, float value, float defaultValue) {
       FloatListEntry entry =
           builder
-              .startFloatField(name, value)
+              .startFloatField(fieldName(id), value)
               .setDefaultValue(defaultValue)
               .setMin(0)
               .setMax(Config.MAX_FADE_DURATION)
