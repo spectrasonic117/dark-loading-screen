@@ -35,6 +35,9 @@
 	"icon": "assets/dark-loading-screen/icon.png",
 	"environment": "client",
 	"entrypoints": {
+		"client": [
+			"io.github.a5b84.darkloadingscreen.DarkLoadingScreen"
+		],
 		"modmenu": [
 			"io.github.a5b84.darkloadingscreen.config.ModMenuApiImpl"
 		]

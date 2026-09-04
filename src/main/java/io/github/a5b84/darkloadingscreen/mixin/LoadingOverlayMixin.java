@@ -84,6 +84,7 @@ public abstract class LoadingOverlayMixin {
       int textureHeight,
       int color,
       Operation<Void> original) {
+
     // `RenderSystem.blendFunc(GL_SRC_ALPHA, Gl_ONE_MINUS_SOURCE_ALPHA)`
     // causes an ugly outline, so we render the logo twice:
     // - once for channels that are brighter than the background

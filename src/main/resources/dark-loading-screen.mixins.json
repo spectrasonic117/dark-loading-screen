@@ -3,7 +3,8 @@
 	"package": "io.github.a5b84.darkloadingscreen.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"LoadingOverlayMixin"
+		"LoadingOverlayMixin",
+		"LogoTextureMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
