@@ -47,10 +47,11 @@ java {
 jar {
 	def projectName = project.name
 	inputs.property "projectName", projectName
-
 	from(["COPYING", "COPYING.LESSER"]) {
 		rename { "${it}_$projectName"}
 	}
+	destinationDirectory = file("${rootDir}/out")
+	archiveFileName = "${rootProject.name}-${version}.jar"
 }
 
 // configure the maven publication
