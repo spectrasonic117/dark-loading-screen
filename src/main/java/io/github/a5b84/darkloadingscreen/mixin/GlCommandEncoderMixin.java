@@ -7,6 +7,7 @@ import io.github.a5b84.darkloadingscreen.DarkLoadingScreen;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL20;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -29,7 +30,7 @@ public abstract class GlCommandEncoderMixin {
   public void onApplyPipelineState(RenderPipeline newPipeline, CallbackInfo ci) {
     if (lastPipeline != newPipeline) {
       if (newPipeline == DarkLoadingScreen.MOJANG_LOGO_SHADOWS) {
-        oldBlendEquation = GL11.glGetInteger(GL14.GL_BLEND_EQUATION);
+        oldBlendEquation = GL11.glGetInteger(GL20.GL_BLEND_EQUATION_RGB);
         GL14.glBlendEquation(GL14.GL_FUNC_REVERSE_SUBTRACT);
       } else if (lastPipeline == DarkLoadingScreen.MOJANG_LOGO_SHADOWS)
         restoreOldBlendEquationIfAny();

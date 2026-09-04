@@ -2,8 +2,6 @@ package io.github.a5b84.darkloadingscreen.mixin;
 
 import static io.github.a5b84.darkloadingscreen.DarkLoadingScreen.config;
 
-import com.llamalad7.mixinextras.expression.Definition;
-import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -11,7 +9,7 @@ import io.github.a5b84.darkloadingscreen.DarkLoadingScreen;
 import io.github.a5b84.darkloadingscreen.DrawTextureLambda;
 import io.github.a5b84.darkloadingscreen.config.PreviewSplashOverlay;
 import java.util.function.IntSupplier;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
@@ -40,14 +38,12 @@ public abstract class LoadingOverlayMixin {
   // Progress bar
 
   /** Renders the bar background and changes the main bar color */
-  @Definition(id = "color", method = "Lnet/minecraft/util/ARGB;color(IIII)I")
-  @Expression("? = color(?, ?, ?, ?)")
   @ModifyVariable(
-      method = "extractProgressBar",
-      at = @At(value = "MIXINEXTRAS:EXPRESSION", shift = At.Shift.AFTER),
-      name = "white")
+      method = "drawProgressBar",
+      at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/util/ARGB;color(IIII)I"),
+      ordinal = 6)
   private int modifyBarColor(
-      int barColor, GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, float opacity) {
+      int barColor, GuiGraphics graphics, int x1, int y1, int x2, int y2, float opacity) {
     int alpha = barColor & 0xff000000;
     graphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, config.barBackgroundColor | alpha);
     return config.barColor | alpha;
@@ -55,14 +51,14 @@ public abstract class LoadingOverlayMixin {
 
   /** Changes the bar border color */
   @ModifyVariable(
-      method = "extractProgressBar",
+      method = "drawProgressBar",
       at =
           @At(
               value = "INVOKE",
-              target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V",
+              target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V",
               ordinal = 0,
               shift = At.Shift.AFTER),
-      name = "white")
+      ordinal = 6)
   private int modifyBarBorderColor(int color) {
     return config.barBorderColor | color & 0xff000000;
   }
@@ -71,14 +67,14 @@ public abstract class LoadingOverlayMixin {
 
   /** Changes the logo color */
   @WrapOperation(
-      method = "extractRenderState",
+      method = "render",
       at =
           @At(
               value = "INVOKE",
               target =
-                  "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIIIIII)V"))
+                  "Lnet/minecraft/client/gui/GuiGraphics;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIIIIII)V"))
   private void onBlit(
-      GuiGraphicsExtractor graphics,
+      GuiGraphics graphics,
       RenderPipeline originalPipeline,
       Identifier sprite,
       int x,
@@ -144,7 +140,7 @@ public abstract class LoadingOverlayMixin {
 
   /** Calls {@link PreviewSplashOverlay#onRemoved()} when the overlay is removed */
   @Inject(
-      method = "extractRenderState",
+      method = "render",
       at =
           @At(
               value = "INVOKE",
@@ -158,15 +154,15 @@ public abstract class LoadingOverlayMixin {
   }
 
   @ModifyConstant(
-      method = "extractRenderState",
-      constant = @Constant(floatValue = LoadingOverlay.FADE_IN_TIME))
+      method = "render",
+      constant = @Constant(floatValue = DarkLoadingScreen.VANILLA_FADE_IN_DURATION))
   private float getFadeInTime(float old) {
     return config.fadeInMillis;
   }
 
   @ModifyConstant(
-      method = "extractRenderState",
-      constant = @Constant(floatValue = LoadingOverlay.FADE_OUT_TIME))
+      method = "render",
+      constant = @Constant(floatValue = DarkLoadingScreen.VANILLA_FADE_OUT_DURATION))
   private float getFadeOutTime(float old) {
     return config.fadeOutMillis;
   }

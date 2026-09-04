@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -24,8 +24,8 @@ public class ButtonEntry extends AbstractConfigListEntry<Void> {
   }
 
   @Override
-  public void extractRenderState(
-      GuiGraphicsExtractor graphics,
+  public void render(
+      GuiGraphics graphics,
       int index,
       int y,
       int x,
@@ -35,11 +35,11 @@ public class ButtonEntry extends AbstractConfigListEntry<Void> {
       int mouseY,
       boolean isHovered,
       float delta) {
-    super.extractRenderState(
+    super.render(
         graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, isHovered, delta);
     button.setX(x + (entryWidth - button.getWidth()) / 2);
     button.setY(y + (entryHeight - button.getHeight()) / 2);
-    button.extractRenderState(graphics, mouseX, mouseY, delta);
+    button.render(graphics, mouseX, mouseY, delta);
   }
 
   @Override

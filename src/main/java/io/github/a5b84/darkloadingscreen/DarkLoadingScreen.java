@@ -1,7 +1,6 @@
 package io.github.a5b84.darkloadingscreen;
 
 import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DestFactor;
 import com.mojang.blaze3d.platform.SourceFactor;
@@ -14,6 +13,10 @@ public class DarkLoadingScreen {
 
   public static final String MOD_ID = "dark-loading-screen";
 
+  /** Vanilla fade in/out durations, in ms */
+  public static final float VANILLA_FADE_IN_DURATION = 500;
+  public static final float VANILLA_FADE_OUT_DURATION = 1000;
+
   /**
    * Render pipeline for the part of the Mojang logo that are darker than the background.
    *
@@ -21,12 +24,11 @@ public class DarkLoadingScreen {
    * @see GlCommandEncoderMixin
    */
   public static final RenderPipeline MOJANG_LOGO_SHADOWS =
-      RenderPipelines.register(
-          RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
-              .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/mojang_logo_shadows"))
-              .withColorTargetState(
-                  new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE)))
-              .build());
+      RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
+          .withLocation(
+              Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/mojang_logo_shadows"))
+          .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE))
+          .build();
 
   public static Config config = Config.read();
 }

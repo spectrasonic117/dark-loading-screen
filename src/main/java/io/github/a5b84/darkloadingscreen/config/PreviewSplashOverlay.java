@@ -9,7 +9,7 @@ public class PreviewSplashOverlay extends LoadingOverlay {
   private final @Nullable Runnable onRemoved;
 
   public PreviewSplashOverlay(long durationMs, @Nullable Runnable onRemoved) {
-    super(Minecraft.getInstance(), new FakeReloadInstance(durationMs), _ -> {}, true);
+    super(Minecraft.getInstance(), new FakeReloadInstance(durationMs), unused -> {}, true);
     this.onRemoved = onRemoved;
   }
 
